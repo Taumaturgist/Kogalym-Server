@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "npx tailwindcss -i ./templates/public/app.css -o ../templates/public/app.css && npx esbuild ./templates/public/app.js --outfile=../templates/public/app.js --bundle && cp ./templates/public/favicon.ico ../templates/public/favicon.ico && cp ./templates/*.html ../templates",
+    "build": "npx tailwindcss -i ./templates/public/app.css -o ../templates/public/app.css --minify && npx esbuild ./templates/public/app.js --outfile=../templates/public/app.js --bundle --minify && cp ./templates/public/favicon.ico ../templates/public/favicon.ico && cp ./templates/*.html ../templates"
+  },
+  "dependencies": {
+    "alpinejs": "^3.13.2",
+    "esbuild": "^0.19.5"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}
