@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"kogalym-backend/auth"
+	"kogalym-backend/business"
 	"kogalym-backend/models"
 	"net/http"
 	"os"
@@ -15,51 +16,74 @@ import (
 var f embed.FS
 
 func main() {
-	// Disable Console Color, you don't need console color when writing the logs to file.
-	gin.DisableConsoleColor()
+	//fmt.Println(auth.HashPassword(os.Getenv("ADMIN_PASSWORD")))
 
-	// Logging to a file.
-	logFile, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
+	setupLogging()
 
 	router := gin.Default()
 
-	templates := template.Must(template.New("").ParseFS(f, "templates/*.html"))
-	router.SetHTMLTemplate(templates)
+	createRoutesForStaticFiles(router)
 
 	models.ConnectDatabase()
 
-	//log.Fatal(auth.HashPassword("dron"))
+	apiRoutes(router)
 
-	// Auth
-	authRouter := router.Group("")
-	{
-		authRouter.POST("/login", auth.Login)
-	}
-
-	// API
-	v1 := router.Group("/api")
-	v1.Use(auth.JwtTokenCheck)
-	{
-		v1.GET("/", getPersons)
-		v1.Use(auth.PrivateACLCheck).GET("/:uid", getPersons)
-	}
-
-	// WEB
-	web := router.Group("")
-	{
-		web.GET("", home)
-		// Статичные файлы фронта
-		web.StaticFS("/public", http.Dir("templates/public"))
-	}
+	webRoutes(router)
 
 	router.Run(":8080")
 }
 
-func home(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", gin.H{
-		"title": "Main website",
-	})
+func apiRoutes(router *gin.Engine) {
+	// API
+	v1 := router.Group("/api")
+
+	// Auth
+	v1.POST("/login", auth.Login)
+
+	v1.Use(auth.JwtTokenCheck)
+	{
+		// todo getSettings
+		v1.GET("", getPersons)
+		v1.Use(auth.PrivateACLCheck).GET("/:uid", getPersons)
+	}
+}
+
+func webRoutes(router *gin.Engine) {
+	web := router.Group("")
+
+	auth.SetupSessionStore(web)
+	auth.SetupCsrfTokens(web)
+
+	// Generate CSRF token
+	web.Use(auth.CsrfCheckMiddleware())
+
+	// Auth
+	{
+		web.GET("/login", auth.LoginPage)
+		web.POST("/login", auth.WebLogin)
+	}
+
+	authenticatedWeb := web.Group("")
+	authenticatedWeb.Use(auth.WebAuthMiddleware())
+	{
+		authenticatedWeb.GET("", business.Home)
+		// todo получение настроек
+
+		// todo требует доработки, перенаправления на главную страницу
+		//authenticatedWeb.POST("/logout", auth.WebLogout)
+		// todo изменение настроек
+	}
+}
+
+func setupLogging() {
+	logFile, _ := os.Create("gin.log")
+	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
+}
+
+func createRoutesForStaticFiles(router *gin.Engine) {
+	templates := template.Must(template.New("").ParseFS(f, "templates/*.html"))
+	router.SetHTMLTemplate(templates)
+	router.StaticFS("/public", http.Dir("templates/public"))
 }
 
 func getPersons(c *gin.Context) {

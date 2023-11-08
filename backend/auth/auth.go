@@ -46,9 +46,9 @@ func parseToken(jwtToken string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+func HashPassword(password string) string {
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes)
 }
 
 func CheckPasswordHash(password, hash string) bool {

@@ -84,6 +84,7 @@ func JwtTokenCheck(c *gin.Context) {
 		})
 		return
 	}
+
 	c.Next()
 }
 
