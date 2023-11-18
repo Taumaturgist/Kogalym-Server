@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/gin-gonic/gin"
 	csrf "github.com/utrack/gin-csrf"
+	"kogalym-backend/helpers"
 	"net/http"
 	"os"
 	"strings"
@@ -30,25 +31,29 @@ func LoginPage(c *gin.Context) {
 }
 
 func WebLogin(c *gin.Context) {
-	login := c.PostForm("login")
-	password := c.PostForm("password")
+	var loginParams LoginData
+	if err := c.ShouldBindJSON(&loginParams); err != nil {
+		helpers.ValidateError(c, err)
+		return
+	}
+	login := loginParams.Login
+	password := loginParams.Password
 
-	// Validate form input
 	if strings.Trim(login, " ") == "" || strings.Trim(password, " ") == "" {
-		setError(c, "Parameters can't be empty", "/login")
+		setErrorJson(c, "Parameters can't be empty")
 		return
 	}
 
 	// Check for username and password match, usually from a database
 	if login != os.Getenv("ADMIN_LOGIN") || !CheckPasswordHash(password, os.Getenv("ADMIN_PASSWORD")) {
-		setError(c, "Authentication failed", "/login")
+		setErrorJson(c, "Неправильный логин или пароль")
 		return
 	}
 
 	// Save the username in the session
 	SetSessionValue(c, sessionUserKey, login)
 
-	c.Redirect(301, "/")
+	c.JSON(http.StatusOK, gin.H{"error": "Failed to save session"})
 }
 
 // todo

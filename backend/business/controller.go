@@ -9,6 +9,6 @@ import (
 func Home(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", gin.H{
 		"csrf":  csrf.GetToken(c),
-		"title": "Main website",
+		"title": "Добро пожаловать на главную страницу",
 	})
 }

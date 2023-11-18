@@ -1,7 +1,7 @@
-{{ if .error }}
-<div class="alert flex flex-row items-center bg-red-200 rounded border-b-2 border-red-300 py-5 mb-4">
-    <div
-            class="alert-icon flex items-center bg-red-100 border-2 border-red-500 justify-center h-10 w-10 flex-shrink-0 rounded-full">
+<template x-if="error">
+    <div class="alert flex flex-row items-center bg-red-200 rounded border-b-2 border-red-300 py-5 mb-4">
+        <div
+                class="alert-icon flex items-center bg-red-100 border-2 border-red-500 justify-center h-10 w-10 flex-shrink-0 rounded-full">
 				<span class="text-red-500">
 					<svg fill="currentColor"
                          viewBox="0 0 20 20"
@@ -11,14 +11,14 @@
                               clip-rule="evenodd"></path>
 					</svg>
 				</span>
-    </div>
-    <div class="alert-content ml-4">
-        <div class="alert-title font-semibold text-sm text-red-800">
-            Ошибка
         </div>
-        <div class="alert-description text-sm text-red-600">
-            {{ .error }}
+        <div class="alert-content ml-4">
+            <div class="alert-title font-semibold text-sm text-red-800">
+                Ошибка
+            </div>
+            <div class="alert-description text-sm text-red-600">
+                <p x-text="error" class="text-red-500 text-xs italic mt-4"></p>
+            </div>
         </div>
     </div>
-</div>
-{{ end }}
+</template>

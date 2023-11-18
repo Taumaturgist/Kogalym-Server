@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+func setErrorJson(c *gin.Context, errorMessage string) {
+	c.JSON(http.StatusBadRequest, gin.H{"error": errorMessage})
+}
+
 func setError(c *gin.Context, errorMessage string, route string) {
 	SetSessionValue(c, "error", errorMessage)
 
