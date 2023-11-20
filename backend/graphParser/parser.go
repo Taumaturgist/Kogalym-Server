@@ -1,43 +1,79 @@
-package main
+package graphParser
 
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 	"kogalym-backend/helpers"
+	"kogalym-backend/models"
+	"math"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 )
 
-type graph struct {
-	name        string
-	units       string
-	description string
-	data        map[string]string
+func ParseData() {
+	currentDir, err := os.Getwd()
+	helpers.CheckErr(err)
+
+	dir := currentDir + "/graphParser/files"
+
+	entries, err := os.ReadDir(dir)
+	helpers.CheckErr(err)
+
+	for _, e := range entries {
+		if e.IsDir() {
+			parseFiles(dir+"/"+e.Name(), e.Name())
+		}
+	}
 }
 
-func main() {
-	parseFiles("./files")
-}
-
-func parse(filepath string) {
+func parse(dir string, filename string, mineName string, isPriorityFile bool) {
 	startGraphTypesWriteString := "DEPTH   .M                                                  :DEPTH"
 	endGraphTypesWriteString := "~Other information"
 	startGraphDataString := "~ASCII Log Data"
+	startDepthDescription := ":START DEPTH"
+	stopDepthDescription := ":STOP DEPTH"
+	stepDepthDescription := ":STEP"
 
-	f, err := os.Open(filepath)
-	if err != nil {
-		fmt.Print("There has been an error!: ", err)
+	filePath := ""
+	if isPriorityFile {
+		filePath = dir + "/*/" + filename
+	} else {
+		filePath = dir + "/" + filename
 	}
+	fmt.Println("++++++++++++++++++++++++++")
+	fmt.Println(filePath)
+
+	f, err := os.Open(filePath)
+	helpers.CheckErr(err)
 	defer f.Close()
 
 	var words []string
 
 	isStartedGraphTypes, isEndedGraphTypes, isStartedData := false, false, false
-	scanner := bufio.NewScanner(f)
-	var graphs = map[string]graph{}
+	charMapDecoder := charmap.Windows1251.NewDecoder()
+	reader := transform.NewReader(f, charMapDecoder)
+	scanner := bufio.NewScanner(reader)
+	var graphs = map[string]models.Graph{}
 	var graphsNames []string
+	var startDepth, stopDepth, stepDepth float64
 	for scanner.Scan() {
 		line := string(scanner.Bytes())
+
+		if !isStartedGraphTypes && strings.Contains(line, startDepthDescription) {
+			startDepth = getValue(line, startDepthDescription)
+		}
+
+		if !isStartedGraphTypes && strings.Contains(line, stopDepthDescription) {
+			stopDepth = getValue(line, stopDepthDescription)
+		}
+
+		if !isStartedGraphTypes && strings.Contains(line, stepDepthDescription) {
+			stepDepth = getValue(line, stepDepthDescription)
+		}
 
 		if !isStartedGraphTypes && line == startGraphTypesWriteString {
 			isStartedGraphTypes = true
@@ -50,16 +86,20 @@ func parse(filepath string) {
 				continue
 			}
 
-			graphName, after, _ := strings.Cut(line, " ")
-			units, after, _ := strings.Cut(strings.TrimSpace(after), " ")
-			description, after, _ := strings.Cut(strings.TrimSpace(after), " ")
+			stringSlice := strings.Fields(line)
+
+			graphName, units, description := stringSlice[0], stringSlice[1], stringSlice[2]
 
 			graphsNames = append(graphsNames, graphName)
-			graphs[graphName] = graph{
-				name:        graphName,
-				units:       units,
-				description: description,
-				data:        make(map[string]string),
+			graphs[graphName] = models.Graph{
+				MineName:    mineName,
+				Name:        graphName,
+				Units:       strings.TrimPrefix(units, `.`),
+				Description: strings.TrimPrefix(description, `:`),
+				StartDepth:  math.Min(startDepth, stopDepth),
+				StopDepth:   math.Max(stopDepth, startDepth),
+				StepDepth:   math.Abs(stepDepth),
+				Data:        make(map[float64]float64),
 			}
 
 			continue
@@ -81,32 +121,50 @@ func parse(filepath string) {
 		depth := chunk[0]
 		chunk = chunk[1:]
 		for idx, name := range graphsNames {
-			graphs[name].data[depth] = chunk[idx]
+			graphs[name].Data[depth] = chunk[idx]
 		}
 	}
 
-	// todo запись в БД
+	models.UpdateOrCreateGraphData(graphs, isPriorityFile)
 
-	if err := scanner.Err(); err != nil {
-		fmt.Println(err)
-	}
+	helpers.CheckErr(scanner.Err())
 }
 
-func parseFiles(dir string) {
+func parseFiles(dir string, mineName string) {
 	entries, err := os.ReadDir(dir)
 	helpers.CheckErr(err)
 
+	// сначала обраабатываем файлы
 	for _, e := range entries {
-		if e.IsDir() {
-			parseFiles(dir + "/" + e.Name())
-		} else {
-			parse(dir + "/" + e.Name())
+		if !e.IsDir() && strings.ToLower(filepath.Ext(dir+"/"+e.Name())) == `.las` {
+			parse(dir, e.Name(), mineName, false)
+		}
+	}
+
+	// потом обрабатываем файлы из вложенной папки *, как приоритетные
+	for _, e := range entries {
+		if e.IsDir() && e.Name() == `*` {
+			entries, err := os.ReadDir(dir + "/*")
+			helpers.CheckErr(err)
+			for _, e := range entries {
+				if !e.IsDir() && strings.ToLower(filepath.Ext(dir+"/*/"+e.Name())) == `.las` {
+					parse(dir, e.Name(), mineName, true)
+				}
+			}
 		}
 	}
 }
 
-func chunkSlice(slice []string, chunkSize int) [][]string {
-	var chunks [][]string
+func getValue(line string, valueDescription string) float64 {
+	startDepth, _, _ := strings.Cut(line, valueDescription)
+	sl := strings.Split(startDepth, " ")
+	number := sl[len(sl)-1]
+	return parseFloat(number)
+}
+
+func chunkSlice(slice []string, chunkSize int) [][]float64 {
+	var chunks [][]float64
+	var floatSlice []float64
 	for {
 		if len(slice) == 0 {
 			break
@@ -116,9 +174,19 @@ func chunkSlice(slice []string, chunkSize int) [][]string {
 			chunkSize = len(slice)
 		}
 
-		chunks = append(chunks, slice[0:chunkSize])
+		for i := 0; i < chunkSize; i++ {
+			floatSlice = append(floatSlice, parseFloat(slice[i]))
+		}
+
+		chunks = append(chunks, floatSlice)
 		slice = slice[chunkSize:]
 	}
 
 	return chunks
+}
+
+func parseFloat(number string) float64 {
+	s, _ := strconv.ParseFloat(number, 32)
+
+	return s
 }

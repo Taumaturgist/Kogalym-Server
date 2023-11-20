@@ -7,6 +7,7 @@ import (
 	"io"
 	"kogalym-backend/auth"
 	"kogalym-backend/business"
+	"kogalym-backend/graphParser"
 	"kogalym-backend/models"
 	"net/http"
 	"os"
@@ -25,6 +26,8 @@ func main() {
 	createRoutesForStaticFiles(router)
 
 	models.ConnectDatabase()
+
+	graphParser.ParseData()
 
 	apiRoutes(router)
 
