@@ -24,7 +24,7 @@ jobs:
 
     - name: Init
       run: |
-        cd /backend
+        cd backend
         go mod init main
       
     - name: Build
