@@ -25,4 +25,10 @@ jobs:
     - name: Build
       run: |
         cd backend
-        go build
+        go build -v
+        
+    - name: Upload Go test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary
+        path: backend/*.exe
