@@ -30,7 +30,7 @@ func main() {
 
 	webRoutes(router)
 
-	router.Run(":8080")
+	router.Run(":80")
 }
 
 func apiRoutes(router *gin.Engine) {
