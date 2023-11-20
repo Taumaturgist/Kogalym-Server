@@ -27,8 +27,11 @@ jobs:
         cd backend
         go build -v
         
-    - name: Upload Go test results
-      uses: actions/upload-artifact@v3
+    - name: Generate build files
+      uses: thatisuday/go-cross-build@v1
       with:
-        name: binary
-        path: backend/*.exe
+          platforms: 'linux/amd64, darwin/amd64, windows/amd64'
+          package: 'main'
+          name: 'program'
+          compress: 'true'
+          dest: 'backend'
