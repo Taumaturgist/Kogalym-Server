@@ -23,7 +23,11 @@ jobs:
         cache-dependency-path: backend/go.sum
 
     - name: Init
-      run: go mod init main
+      run: |
+        cd /backend
+        go mod init main
       
     - name: Build
-      run: go build
+      run: |
+        cd backend
+        go build
