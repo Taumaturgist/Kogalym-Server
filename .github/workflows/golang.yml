@@ -25,7 +25,7 @@ jobs:
     - name: Build
       run: |
         cd backend
-        env GOOS=windows GOARCH=amd64 go build -buildmode exe
+        env GOOS=windows GOARCH=amd64 go build -o ${{ github.workspace }}/backend/kogalym-backend.exe main.go
         
     - name: Upload Go
       uses: actions/upload-artifact@v3
