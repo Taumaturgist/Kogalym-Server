@@ -25,13 +25,10 @@ jobs:
     - name: Build
       run: |
         cd backend
-        go build -v
+        go build -buildmode exe
         
-    - name: Generate build files
-      uses: thatisuday/go-cross-build@v1
+    - name: Upload Go
+      uses: actions/upload-artifact@v3
       with:
-          platforms: 'linux/amd64, darwin/amd64, windows/amd64'
-          package: 'backend'
-          name: 'program'
-          compress: 'true'
-          dest: 'backend'
+        name: exe
+        path: /backend/*.exe
