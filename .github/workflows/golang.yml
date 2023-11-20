@@ -31,4 +31,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: exe
-        path: /backend/*.exe
+        path: ${{ github.workspace }}/backend/*.exe
