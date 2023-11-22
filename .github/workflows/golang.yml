@@ -4,6 +4,7 @@
 name: Go Buld
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "master", "develop" ]
   pull_request:
