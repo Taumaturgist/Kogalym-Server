@@ -4,11 +4,11 @@
 name: Go Buld
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
 
