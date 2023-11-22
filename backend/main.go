@@ -2,12 +2,14 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"html/template"
 	"io"
 	"kogalym-backend/auth"
 	"kogalym-backend/business"
-	"kogalym-backend/models"
+	"log"
 	"net/http"
 	"os"
 )
@@ -16,36 +18,18 @@ import (
 var f embed.FS
 
 func main() {
-	//fmt.Println(auth.HashPassword(os.Getenv("ADMIN_PASSWORD")))
-
+	loadEnv()
 	setupLogging()
 
 	router := gin.Default()
 
 	createRoutesForStaticFiles(router)
 
-	models.ConnectDatabase()
-
-	apiRoutes(router)
-
 	webRoutes(router)
 
-	router.Run(":8080")
-}
+	fmt.Println(os.Getenv("PORT"))
 
-func apiRoutes(router *gin.Engine) {
-	// API
-	v1 := router.Group("/api")
-
-	// Auth
-	v1.POST("/login", auth.Login)
-
-	v1.Use(auth.JwtTokenCheck)
-	{
-		// todo getSettings
-		v1.GET("", getPersons)
-		v1.Use(auth.PrivateACLCheck).GET("/:uid", getPersons)
-	}
+	router.Run(":" + os.Getenv("PORT"))
 }
 
 func webRoutes(router *gin.Engine) {
@@ -67,11 +51,7 @@ func webRoutes(router *gin.Engine) {
 	authenticatedWeb.Use(auth.WebAuthMiddleware())
 	{
 		authenticatedWeb.GET("", business.Home)
-		// todo получение настроек
-
-		// todo требует доработки, перенаправления на главную страницу
-		//authenticatedWeb.POST("/logout", auth.WebLogout)
-		// todo изменение настроек
+		authenticatedWeb.POST("/logout", auth.WebLogout)
 	}
 }
 
@@ -86,6 +66,10 @@ func createRoutesForStaticFiles(router *gin.Engine) {
 	router.StaticFS("/public", http.Dir("templates/public"))
 }
 
-func getPersons(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"result": "Something"})
+func loadEnv() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 }
