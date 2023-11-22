@@ -5,7 +5,7 @@ name: Go Buld
 
 on:
   push:
-    branches: [ "master", "ci" ]
+    branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master" ]
 
