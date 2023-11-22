@@ -1,18 +1,13 @@
-window.loginApi = function () {
-    fetch('/login', {
-        method: 'POST',
-        headers: {
+window.logoutApi = function () {
+    fetch('/logout', {
+        method: 'POST', headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            login: this.login,
-            password: this.password,
-        }),
     })
         .then(response => {
             if (response.ok) {
                 // Если авторизация успешна, перенаправьте пользователя на главную страницу
-                window.location.href = '/';
+                window.location.href = '/login';
             } else {
                 return response.json(); // Парсим ответ как JSON
             }
