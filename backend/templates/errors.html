@@ -1,4 +1,4 @@
-<template x-if="error">
+<template x-if="error && error.length > 0">
     <div class="alert flex flex-row items-center bg-red-200 rounded border-b-2 border-red-300 py-5 mb-4">
         <div
                 class="alert-icon flex items-center bg-red-100 border-2 border-red-500 justify-center h-10 w-10 flex-shrink-0 rounded-full">
@@ -17,7 +17,9 @@
                 Ошибка
             </div>
             <div class="alert-description text-sm text-red-600">
-                <p x-text="error" class="text-red-500 text-sm italic mt-4"></p>
+                <ul>
+                    <li x-for="errorMessage in error" x-text="errorMessage"></li>
+                </ul>
             </div>
         </div>
     </div>

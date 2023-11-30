@@ -52,6 +52,15 @@ func webRoutes(router *gin.Engine) {
 	{
 		authenticatedWeb.GET("", business.Home)
 		authenticatedWeb.POST("/logout", auth.WebLogout)
+
+		authenticatedWeb.GET("/groups", business.WebGroups)
+	}
+
+	api := authenticatedWeb.Group("/api")
+	{
+		api.GET("/groups", business.Groups)
+		api.POST("/groups", business.CreateGroup)
+		api.PUT("/groups/:id", business.UpdateGroup)
 	}
 }
 
