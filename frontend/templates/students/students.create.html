@@ -2,23 +2,35 @@
     <div class="modal-container mx-auto">
         <div class="modal-div">
             <div class="modal-header">
-                <h5 class="modal-title">Создать группу</h5>
+                <h5 class="modal-title">Создать пользователя</h5>
             </div>
             <div class="modal-body">
                 {{ template "errors.html" .}}
                 <input type="hidden" name="_csrf" value="{{.csrf}}"/>
 
-                <label for="createGroupName">Наименование:</label>
+                <label for="name" class="modal-label">
+                    Имя:
+                </label>
                 <input type="text"
-                       id="createGroupName"
-                       x-on:input="createGroupName = $event.target.value"
+                       id="name"
+                       x-on:input="createStudent.Name = $event.target.value"
                        class="text-input"
                        required
                        autocomplete="editGroupName"
                        autofocus/>
+
+                <label for="groupId" class="modal-label">
+                    Группа:
+                </label>
+                <select x-model="createStudent.GroupId" @click="loadGroups" class="text-input">
+                    <template x-for="group in groups">
+                        <option x-bind:value="group.Id" x-text="group.Name">
+                        </option>
+                    </template>
+                </select>
             </div>
             <div class="modal-footer">
-                <button @click="createGroup()" class="btn-primary">
+                <button @click="create()" class="btn-primary">
                     Создать
                 </button>
                 <button @click="showCreateModal = false" class="btn-primary">

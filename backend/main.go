@@ -9,6 +9,8 @@ import (
 	"io"
 	"kogalym-backend/auth"
 	"kogalym-backend/business"
+	"kogalym-backend/business/groups"
+	"kogalym-backend/business/students"
 	"log"
 	"net/http"
 	"os"
@@ -53,14 +55,19 @@ func webRoutes(router *gin.Engine) {
 		authenticatedWeb.GET("", business.Home)
 		authenticatedWeb.POST("/logout", auth.WebLogout)
 
-		authenticatedWeb.GET("/groups", business.WebGroups)
+		authenticatedWeb.GET("/groups", groups.IndexGroups)
+		authenticatedWeb.GET("/students", students.IndexStudents)
 	}
 
 	api := authenticatedWeb.Group("/api")
 	{
-		api.GET("/groups", business.Groups)
-		api.POST("/groups", business.CreateGroup)
-		api.PUT("/groups/:id", business.UpdateGroup)
+		api.GET("/groups", groups.GetGroups)
+		api.POST("/groups", groups.CreateGroup)
+		api.PUT("/groups/:id", groups.UpdateGroup)
+
+		api.GET("/students", students.GetStudents)
+		api.POST("/students", students.CreateStudent)
+		api.PUT("/students/:id", students.UpdateStudent)
 	}
 }
 

@@ -1,0 +1,65 @@
+{{ template "header.html" .}}
+
+{{ template "navigation.html" .}}
+
+<main x-data="students" x-init="loadData()">
+    <div class="py-4">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="overflow-hidden p-6 bg-white border-b border-gray-200">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th class="px-6 py-3 bg-gray-50 text-left">
+                            <span class="text-sm leading-4 font-semibold text-gray-500 uppercase tracking-wider">
+                            <button type="button"
+                                    class="inline-flex items-center px-2 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150"
+                                    @click="openCreateModal()"
+                            >
+                              <span class="material-icons">add</span>
+                            </button>
+                            </span>
+                            </th>
+                            <th class="px-6 py-3 bg-gray-50 text-left">
+                              <span class="text-sm leading-4 font-semibold text-gray-500 uppercase tracking-wider">
+                                Наименование
+                              </span>
+                            </th>
+                            <th class="px-6 py-3 bg-gray-50 text-left">
+                              <span class="text-sm leading-4 font-semibold text-gray-500 uppercase tracking-wider">
+                                Группа
+                              </span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template x-for="student in students" :key="student.Id">
+                            <tr>
+                                <td>
+                                    <button
+                                            type="button"
+                                            class="inline-flex items-center px-2 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150"
+                                            @click="openEditModal(student)"
+                                    >
+                                        <span class="material-icons">edit</span>
+                                    </button>
+                                </td>
+                                <td x-text="student.Name"></td>
+                                <td x-text="getGroupName(student.GroupId)"></td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ template "students.edit.html" .}}
+
+    {{ template "students.create.html" .}}
+
+</main>
+
+{{ template "footer.html" .}}
+

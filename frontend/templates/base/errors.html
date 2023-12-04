@@ -18,7 +18,9 @@
             </div>
             <div class="alert-description text-sm text-red-600">
                 <ul>
-                    <li x-for="errorMessage in error" x-text="errorMessage"></li>
+                    <template x-for="errorMessage in error">
+                        <li x-text="errorMessage"></li>
+                    </template>
                 </ul>
             </div>
         </div>

@@ -6,7 +6,8 @@ import (
 )
 
 func setErrorJson(c *gin.Context, errorMessage string) {
-	c.JSON(http.StatusBadRequest, gin.H{"error": errorMessage})
+	errorArray := []string{errorMessage}
+	c.JSON(http.StatusBadRequest, gin.H{"error": errorArray})
 }
 
 func setError(c *gin.Context, errorMessage string, route string) {

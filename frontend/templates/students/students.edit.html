@@ -2,25 +2,38 @@
     <div class="modal-container mx-auto">
         <div class="modal-div">
             <div class="modal-header">
-                <h5 class="modal-title">Редактировать группу</h5>
+                <h5 class="modal-title">Редактировать студента</h5>
             </div>
             <div class="modal-body">
                 {{ template "errors.html" .}}
-
                 <input type="hidden" name="_csrf" value="{{.csrf}}"/>
 
-                <label for="editGroupName">Наименование:</label>
+                <label for="editGroupName">
+                    Имя:
+                </label>
                 <input type="text"
                        id="editGroupName"
-                       x-bind:value="editGroup.Name"
-                       x-on:input="editGroup.Name = $event.target.value"
+                       x-bind:value="editStudent.Name"
+                       x-on:input="editStudent.Name = $event.target.value"
                        class="text-input"
                        required
                        autocomplete="editGroupName"
                        autofocus/>
+
+                <label for="groupId" class="modal-label">
+                    Группа:
+                </label>
+
+                <select x-model="createStudent.GroupId" @click="loadGroups" class="text-input">
+                    <template x-for="group in groups">
+                        <option x-bind:value="group.Id" x-text="group.Name"
+                                x-bind:selected="editStudent.GroupId === group.Id">
+                        </option>
+                    </template>
+                </select>
             </div>
             <div class="modal-footer">
-                <button @click="saveChanges" class="btn-primary">
+                <button @click="update" class="btn-primary">
                     Обновить
                 </button>
                 <button @click="showUpdateModal = false" class="btn-primary">
