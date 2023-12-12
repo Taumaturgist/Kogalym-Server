@@ -1,5 +1,6 @@
 /gin-bin
 /mcli
 /go.sqlite
-/kogalym-backend
+/Kogalym/backend
 /gin.log
+/config/wire_gen.go

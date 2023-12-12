@@ -1,10 +1,9 @@
 {{ template "header.html" .}}
 <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-    <div x-data="{ login: '', password: '', error: '', loggedIn: false }"
+    <div x-data="{ login: '', password: '', error: '', loggedIn: false,  csrf: '{{ .csrf }}'}"
          class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
         <form x-show="!loggedIn" @submit.prevent="loginApi">
             {{ template "errors.html" .}}
-            <input type="hidden" name="_csrf" value="{{.csrf}}">
             <!-- Email Address -->
             <div>
                 <label class="block font-medium text-sm text-gray-700" for="login">

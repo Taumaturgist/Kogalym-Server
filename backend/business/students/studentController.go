@@ -1,9 +1,9 @@
 package students
 
 import (
+	"Kogalym/backend/helpers"
 	"github.com/gin-gonic/gin"
 	csrf "github.com/utrack/gin-csrf"
-	"kogalym-backend/helpers"
 	"net/http"
 	"strconv"
 )
@@ -31,7 +31,7 @@ func UpdateStudent(c *gin.Context) {
 	var request UpdateStudentRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		helpers.ValidateError(c, err)
+		//helpers.ValidateError(c, err)
 		return
 	}
 
@@ -55,7 +55,7 @@ func CreateStudent(c *gin.Context) {
 	var request CreateStudentRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		helpers.WebValidateError(c, err)
+		//helpers.WebValidateError(c, err)
 		return
 	}
 

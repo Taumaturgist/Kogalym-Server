@@ -4,6 +4,7 @@ window.logout = () => {
             fetch('/logout', {
                 method: 'POST', headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': this.csrf,
                 },
             })
                 .then(response => {
@@ -15,8 +16,8 @@ window.logout = () => {
                     }
                 })
                 .then(data => {
-                    if (data && data.error) {
-                        this.error = data.error;
+                    if (data && data.data) {
+                        this.error = data.data;
                     }
                 });
         },

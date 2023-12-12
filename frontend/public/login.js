@@ -3,6 +3,7 @@ window.loginApi = function () {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-Token': this.csrf,
         },
         body: JSON.stringify({
             login: this.login,
@@ -18,8 +19,8 @@ window.loginApi = function () {
             }
         })
         .then(data => {
-            if (data && data.error) {
-                this.error = data.error;
+            if (data && data.data) {
+                this.error = data.data;
             }
         });
 }

@@ -26,13 +26,13 @@ jobs:
     - name: Build
       run: |
         cd backend
-        env GOOS=windows GOARCH=amd64 go build -o ${{ github.workspace }}/backend/kogalym-backend.exe main.go
+        env GOOS=windows GOARCH=amd64 go build -o ${{ github.workspace }}/backend/Kogalym/backend.exe main.go
 
     - name: Prepare Artifacts
       run: |
         cd backend
         mkdir artifacts
-        cp kogalym-backend.exe ${{ github.workspace }}/backend/artifacts
+        cp Kogalym/backend.exe ${{ github.workspace }}/backend/artifacts
         cp .env  ${{ github.workspace }}/backend/artifacts
     
     - name: Upload Go

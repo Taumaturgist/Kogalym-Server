@@ -1,38 +1,45 @@
 package groups
 
-var Groups = []Group{
-	{Id: 1, Name: `Группа 1`},
-	{Id: 2, Name: `Группа 2`},
+import (
+	"Kogalym/backend/helpers"
+)
+
+type GroupRepository struct {
+	DB *helpers.Database
 }
 
-func getAll() []Group {
-	return Groups
+func NewGroupRepository() *GroupRepository {
+	return &GroupRepository{DB: helpers.GetDB()}
 }
 
-func GetById(id int) Group {
-	var result Group
-
-	for _, group := range Groups {
-		if group.Id == id {
-			result = group
-			break
-		}
+func (groupRepo *GroupRepository) GetAllGroups() ([]Group, error) {
+	var groups []Group
+	if err := groupRepo.DB.DB.Find(&groups).Error; err != nil {
+		return nil, err
 	}
+	return groups, nil
+}
 
-	return result
+func GetById(groupRepo *GroupRepository, id int) (*Group, error) {
+	var result Group
+	if err := groupRepo.DB.DB.First(&result, id).Error; err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func create(name string) Group {
 	return Group{
-		Id:   10,
+		ID:   10,
 		Name: name,
 	}
 }
 
-func update(id int, name string) Group {
-	group := GetById(id)
+func update(groupRepo *GroupRepository, id int, name string) *Group {
+	group, _ := GetById(groupRepo, id)
 
 	group.Name = name
+	groupRepo.DB.DB.Save(&group)
 
 	return group
 }

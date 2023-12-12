@@ -42,8 +42,8 @@ window.groups = () => {
                     this.showCreateModal = false;
                 })
                 .catch(error => {
-                    if (error.response?.data?.errors) {
-                        this.error = Object.values(error.response.data.errors);
+                    if (error.response?.data?.data) {
+                        this.error = Object.values(error.response.data.data);
                     }
                 });
         },
@@ -65,8 +65,8 @@ window.groups = () => {
                     this.showUpdateModal = false;
                 })
                 .catch(error => {
-                    if (error.response && error.response.data && error.response.data.errors) {
-                        this.error = Object.values(error.response.data.errors)
+                    if (error.response && error.response.data && error.response.data.data) {
+                        this.error = Object.values(error.response.data.data)
                             .flatMap(messages => Array.isArray(messages) ? messages : [messages]);
                     }
                 });
