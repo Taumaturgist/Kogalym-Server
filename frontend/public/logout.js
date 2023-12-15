@@ -1,5 +1,10 @@
 window.logout = () => {
     return {
+        isActiveTab: 'groups',
+        changeActiveTab(tab) {
+            this.isActiveTab = tab;
+        },
+
         logoutApi: function () {
             fetch('/logout', {
                 method: 'POST', headers: {
